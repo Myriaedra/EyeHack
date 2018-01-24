@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
     public  CinemachineFreeLook freeLookCM;
 	Rigidbody rb;
     public static bool controlsAble = true;
+	public static bool isAiming = false;
 
     [Header("GroundValues : ")]
     public float groundAcceleration;
@@ -96,28 +97,30 @@ public class PlayerController : MonoBehaviour {
 
 	void OrientCharacter(float lerpValue)//FONCTION ORIENTATION PERSO
 	{
-		//Check joystick input
-		float xSpeed = Input.GetAxis("Horizontal");
-		float zSpeed = Input.GetAxis("Vertical");
-		Vector3 velocityAxis = new Vector3(xSpeed, 0, zSpeed);
-		//Convert direction depending on the camera
-		velocityAxis = Quaternion.AngleAxis(cam.transform.eulerAngles.y, Vector3.up) * velocityAxis;
-		//Actual velocity
-		Vector3 hVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
-		//If the character is moving
-		if (hVelocity.magnitude > 1 && velocityAxis.magnitude > 0)
+		if (!isAiming) 
 		{
-			Vector3 newVelocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
-			float wantedAngle = transform.eulerAngles.y; //Declare
-			//Checks which side to turn (shortest way)
-			float angle = Vector3.Angle(transform.forward, newVelocity.normalized);
-			Vector3 cross = Vector3.Cross(transform.forward, newVelocity.normalized);
-			if (cross.y < 0)
-				angle = -angle;
-			wantedAngle = transform.eulerAngles.y + angle;
-			//Rotate SMOOTHLY to the right direction
-			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler (0, wantedAngle, 0), lerpValue);
+			//Check joystick input
+			float xSpeed = Input.GetAxis ("Horizontal");
+			float zSpeed = Input.GetAxis ("Vertical");
+			Vector3 velocityAxis = new Vector3 (xSpeed, 0, zSpeed);
+			//Convert direction depending on the camera
+			velocityAxis = Quaternion.AngleAxis (cam.transform.eulerAngles.y, Vector3.up) * velocityAxis;
+			//Actual velocity
+			Vector3 hVelocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
+
+			//If the character is moving
+			if (hVelocity.magnitude > 1 && velocityAxis.magnitude > 0) {
+				Vector3 newVelocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
+				float wantedAngle = transform.eulerAngles.y; //Declare
+				//Checks which side to turn (shortest way)
+				float angle = Vector3.Angle (transform.forward, newVelocity.normalized);
+				Vector3 cross = Vector3.Cross (transform.forward, newVelocity.normalized);
+				if (cross.y < 0)
+					angle = -angle;
+				wantedAngle = transform.eulerAngles.y + angle;
+				//Rotate SMOOTHLY to the right direction
+				transform.rotation = Quaternion.Slerp (transform.rotation, Quaternion.Euler (0, wantedAngle, 0), lerpValue);
+			}
 		}
 	}
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HackGun : MonoBehaviour {
 	TP_ShoulderAiming aimingSys;
-	bool aiming;
+
 
 	// Use this for initialization
 	void Start () {
@@ -13,15 +13,15 @@ public class HackGun : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetAxisRaw ("Aim") > 0.8 && !aiming) 
+		if (Input.GetAxisRaw ("Aim") > 0.8 && !PlayerController.isAiming) 
 		{
-			aiming = true;
-			aimingSys.AimingMode (aiming);
+			PlayerController.isAiming = true;
+			aimingSys.AimingMode (true);
 		} 
-		else if (Input.GetAxisRaw ("Aim") < 0.2 && aiming) 
+		else if (Input.GetAxisRaw ("Aim") < 0.2 && PlayerController.isAiming) 
 		{
-			aiming = false;
-			aimingSys.AimingMode (aiming);
+			PlayerController.isAiming = false;
+			aimingSys.AimingMode (false);
 		}
 
 		if (Input.GetButtonDown("Hack"))

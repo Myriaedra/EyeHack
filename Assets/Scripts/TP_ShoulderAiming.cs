@@ -5,7 +5,6 @@ using Cinemachine;
 
 public class TP_ShoulderAiming : MonoBehaviour {
 	public Transform aimMarker;
-	public bool isAiming;
 	public CinemachineVirtualCamera aimingView;
 	public CinemachineFreeLook normalView;
 	// Use this for initialization
