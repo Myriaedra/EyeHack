@@ -35,13 +35,6 @@ public class PlayerController : MonoBehaviour {
 
 	void Update()//--------------------------------------------------------------------------------------------------------------------------
 	{
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            if (controlsAble)
-                controlsAble = false;
-            else
-                controlsAble = true;
-        }
 
         //JUMP MANAGEMENT
         if (Input.GetButtonDown("Jump") && IsGrounded() && controlsAble)
@@ -79,7 +72,6 @@ public class PlayerController : MonoBehaviour {
 			Move(groundAcceleration);
 			LimitVelocity(groundMaxSpeed);
 			OrientCharacter(0.2f);
-			FeedbacksManagement(false);
             Drag(groundDragValue);
 	}
 
@@ -90,7 +82,6 @@ public class PlayerController : MonoBehaviour {
             LimitVelocity(airMaxSpeed);
             OrientCharacter(0.05f);
             Drag(airDragValue);
-            FeedbacksManagement(false);
 	}
 
 	void LimitVelocity(float speedLimit)//FONCTION MAXSPEED
@@ -175,30 +166,5 @@ public class PlayerController : MonoBehaviour {
 			}
 			return false;
 		}
-	}
-
-	void FeedbacksManagement(bool sprintOrNot)
-	{
-		float wantedVignetteValue;
-		float wantedFieldOfView;
-		if (sprintOrNot)
-		{
-			wantedVignetteValue = 0.42f;
-			wantedFieldOfView = 53;
-		}
-		else
-		{
-			wantedVignetteValue = 0.30f;
-			wantedFieldOfView = 40;
-		}
-			
-        //field of view management----------------------------------
-
-        freeLookCM.m_Lens.FieldOfView = Mathf.Lerp(cam.fieldOfView, wantedFieldOfView, 0.05f);
-	}
-
-	public void PlayerControl( bool value)
-	{
-		controlsAble = value;
 	}
 }

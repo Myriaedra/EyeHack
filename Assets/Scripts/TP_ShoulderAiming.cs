@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class TP_ShoulderAiming : MonoBehaviour {
 	public Transform aimMarker;
+	public bool isAiming;
+	public CinemachineVirtualCamera aimingView;
+	public CinemachineFreeLook normalView;
 	// Use this for initialization
 	void Start () {
 		
@@ -11,13 +15,19 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetButtonDown ("Hack")) 
+		/*if (Input.GetButtonDown ("Hack")) 
 		{
 			GetTargetPoint ();
-		}
+		}*/
 	}
 
-	Vector3 GetTargetPoint()
+	public void AimingMode (bool value)
+	{
+		normalView.enabled = !value;
+		aimingView.gameObject.SetActive(value);
+	}
+
+	public Vector3 GetTargetPoint()
 	{
 		Vector3 aimingPoint = new Vector3(0,0,0);
 		RaycastHit hit;
