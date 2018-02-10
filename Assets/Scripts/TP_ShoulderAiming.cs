@@ -9,28 +9,50 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	public CinemachineFreeLook normalView;
 
 	public Vector3[] cameraCorners;
-	public float aimMarkerSpeed;
+	public float horizontalSpeed;
+	public float verticalSpeed;
+	public float vMax;
+	public float vMin;
+
+	float verticalRotation;
+	float vChange;
 
 
 
 	// Use this for initialization
 	void Start () {
 		cameraCorners = new Vector3[4];
+		verticalRotation = aimingView.transform.localRotation.eulerAngles.x;
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	void FixedUpdate () 
 	{
-		if (Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f || Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
+		if (Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f)// || Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
 		{
-			float vChange = -Input.GetAxis("OrbitVertical")*aimMarkerSpeed;
-			float hChange = Input.GetAxis("OrbitHorizontal")*aimMarkerSpeed;
+			float hChange = Input.GetAxis("OrbitHorizontal")*horizontalSpeed;
 
-			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x+hChange, aimMarker.localPosition.y+vChange, aimMarker.localPosition.z);
+			transform.rotation = Quaternion.Euler(new Vector3 (transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y+hChange, transform.rotation.eulerAngles.z));
 		}
 
-		UpdateCameraCorners (Camera.main.transform.position, Camera.main.transform.rotation);
-		CheckCameraBoundraries ();
+		if (Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
+		{
+			if (vChange >= vMin && vChange <= vMax) 
+			{
+				vChange += Input.GetAxis ("OrbitVertical") * verticalSpeed;
+
+				if (vChange < vMin)
+					vChange = vMin;
+				
+				if (vChange > vMax)
+					vChange = vMax;
+			}
+			
+			aimingView.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.localRotation.eulerAngles.y, aimingView.transform.localRotation.eulerAngles.z));
+		}
+
+		/*UpdateCameraCorners (Camera.main.transform.position, Camera.main.transform.rotation);
+		CheckCameraBoundraries ();*/
 	}
 
 	public void AimingMode (bool value)
