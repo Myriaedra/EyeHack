@@ -59,9 +59,11 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	{
 		normalView.enabled = !value;
 		aimingView.gameObject.SetActive(value);
+		vChange = 0f;
+		aimingView.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.localRotation.eulerAngles.y, aimingView.transform.localRotation.eulerAngles.z));
 	}
 
-	public void CheckCameraBoundraries()
+	/*public void CheckCameraBoundraries()
 	{
 		RaycastHit hit;
 		Ray topBound = new Ray (cameraCorners[0], cameraCorners[1] - cameraCorners[0]);
@@ -110,21 +112,22 @@ public class TP_ShoulderAiming : MonoBehaviour {
 			}
 		}
 
-	}
+	}*/
 
 	public Vector3 GetTargetPoint()
 	{
 		Vector3 aimingPoint = new Vector3(0,0,0);
 		RaycastHit hit;
 
-		if (Physics.Raycast (aimMarker.position, Camera.main.transform.position-aimMarker.position, out hit)) 
+		if (Physics.Raycast (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, out hit)) 
 		{
 			aimingPoint = hit.point;
 		}
+		Debug.DrawRay (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, Color.green, 2f);
 		return aimingPoint;
 	}
 
-	public void UpdateCameraCorners(Vector3 cameraPosition, Quaternion atRotation)
+	/*public void UpdateCameraCorners(Vector3 cameraPosition, Quaternion atRotation)
 	{
 		//clear the content of intoArray
 		cameraCorners = new Vector3[4];
@@ -141,7 +144,7 @@ public class TP_ShoulderAiming : MonoBehaviour {
 		cameraCorners[2] = (atRotation * new Vector3(-x,-y,z))+ cameraPosition;
 		//bottom right
 		cameraCorners[3] = (atRotation * new Vector3(x,-y,z))+ cameraPosition;
-	}
+	}*/
 
 
 }

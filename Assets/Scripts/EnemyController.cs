@@ -36,14 +36,14 @@ public class EnemyController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		print (view);
+		//print (view);
 		if (GeometryUtility.TestPlanesAABB (cameraPlanes, player.bounds)) 
 		{
-			print ("Seen you");
+			//print ("Seen you");
 		}
 		else
 		{
-			print ("Unseen");
+			//print ("Unseen");
 		}
 	}
 
