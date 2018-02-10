@@ -8,38 +8,19 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	public CinemachineVirtualCamera aimingView;
 	public CinemachineFreeLook normalView;
 
-	Vector3[] cameraCorners;
+	public Vector3[] cameraCorners;
 	public float aimMarkerSpeed;
 
 
 
 	// Use this for initialization
 	void Start () {
-		
+		cameraCorners = new Vector3[4];
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		/*if (Input.GetAxis ("OrbitHorizontal") > 0.2f) 
-		{
-			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x+aimMarkerSpeed, aimMarker.localPosition.y, aimMarker.localPosition.z);
-		}
-
-		if (Input.GetAxis ("OrbitHorizontal") < -0.2f) 
-		{
-			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x-aimMarkerSpeed, aimMarker.localPosition.y, aimMarker.localPosition.z);
-		}
-
-		if (Input.GetAxis ("OrbitVertical") > 0.2f) 
-		{
-			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x, aimMarker.localPosition.y-aimMarkerSpeed, aimMarker.localPosition.z);
-		}
-
-		if (Input.GetAxis ("OrbitVertical") < -0.2f) 
-		{
-			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x, aimMarker.localPosition.y+aimMarkerSpeed, aimMarker.localPosition.z);
-		}*/
-
+	void Update () 
+	{
 		if (Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f || Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
 		{
 			float vChange = -Input.GetAxis("OrbitVertical")*aimMarkerSpeed;
@@ -48,14 +29,65 @@ public class TP_ShoulderAiming : MonoBehaviour {
 			aimMarker.localPosition = new Vector3 (aimMarker.localPosition.x+hChange, aimMarker.localPosition.y+vChange, aimMarker.localPosition.z);
 		}
 
-
-		UpdateCameraClipPoints (transform.position, Camera.main.transform.rotation, cameraCorners);
+		UpdateCameraCorners (Camera.main.transform.position, Camera.main.transform.rotation);
+		CheckCameraBoundraries ();
 	}
 
 	public void AimingMode (bool value)
 	{
 		normalView.enabled = !value;
 		aimingView.gameObject.SetActive(value);
+	}
+
+	public void CheckCameraBoundraries()
+	{
+		RaycastHit hit;
+		Ray topBound = new Ray (cameraCorners[0], cameraCorners[1] - cameraCorners[0]);
+		Ray leftBound = new Ray (cameraCorners[0], cameraCorners[2] - cameraCorners[0]);
+		Ray bottomBound = new Ray (cameraCorners [2], cameraCorners [3] - cameraCorners [2]);
+		Ray rightBound = new Ray (cameraCorners [1], cameraCorners [3] - cameraCorners [1]);
+
+		Debug.DrawRay (cameraCorners[0], cameraCorners[1] - cameraCorners[0], Color.magenta); //top
+		Debug.DrawRay (cameraCorners[0], cameraCorners[2] - cameraCorners[0], Color.magenta); //left
+		Debug.DrawRay (cameraCorners[2], cameraCorners[3] - cameraCorners[2], Color.magenta); //bottom
+		Debug.DrawRay (cameraCorners[1], cameraCorners[3] - cameraCorners[1], Color.magenta); //right
+
+		///////////////////////////////////////////////
+		/// //////////////////////////////////////////// beware of parenting
+		/// ////////////////////////////////////////////
+		/// ///////////////////////////////////////////// 
+		if (Physics.Raycast (topBound, out hit)) 
+		{
+			if (hit.collider.transform == aimMarker) 
+			{
+				aimingView.transform.localRotation = Quaternion.Euler(new Vector3 (aimingView.transform.localRotation.eulerAngles.x-0.2f, aimingView.transform.localRotation.eulerAngles.y, aimingView.transform.localRotation.eulerAngles.z));
+			}
+		}
+
+		if (Physics.Raycast (leftBound, out hit)) 
+		{
+			if (hit.collider.transform == aimMarker) 
+			{
+
+			}
+		}
+
+		if (Physics.Raycast (bottomBound, out hit)) 
+		{
+			if (hit.collider.transform == aimMarker) 
+			{
+
+			}
+		}
+
+		if (Physics.Raycast (rightBound, out hit)) 
+		{
+			if (hit.collider.transform == aimMarker) 
+			{
+
+			}
+		}
+
 	}
 
 	public Vector3 GetTargetPoint()
@@ -70,23 +102,23 @@ public class TP_ShoulderAiming : MonoBehaviour {
 		return aimingPoint;
 	}
 
-	public void UpdateCameraClipPoints(Vector3 cameraPosition, Quaternion atRotation, Vector3[] intoArray)
+	public void UpdateCameraCorners(Vector3 cameraPosition, Quaternion atRotation)
 	{
 		//clear the content of intoArray
-		intoArray = new Vector3[4];
+		cameraCorners = new Vector3[4];
 
-		float z = Camera.main.nearClipPlane;
-		float x = Mathf.Tan (Camera.main.fieldOfView / 3.41f) * z;
+		float z = aimMarker.localPosition.z;
+		float x = Mathf.Tan (Camera.main.fieldOfView / 4f) * z;
 		float y = x / Camera.main.aspect;
 
 		//top left
-		intoArray[0] = (atRotation * new Vector3(-x,y,z))+ cameraPosition; //added and rotated the point relative to camera
+		cameraCorners[0] = (atRotation * new Vector3(-x,y,z))+ cameraPosition; //added and rotated the point relative to camera
 		//top right
-		intoArray[1] = (atRotation * new Vector3(x,y,z))+ cameraPosition;
+		cameraCorners[1] = (atRotation * new Vector3(x,y,z))+ cameraPosition;
 		//bottom left
-		intoArray[2] = (atRotation * new Vector3(-x,-y,z))+ cameraPosition;
+		cameraCorners[2] = (atRotation * new Vector3(-x,-y,z))+ cameraPosition;
 		//bottom right
-		intoArray[3] = (atRotation * new Vector3(x,-y,z))+ cameraPosition;
+		cameraCorners[3] = (atRotation * new Vector3(x,-y,z))+ cameraPosition;
 	}
 
 
