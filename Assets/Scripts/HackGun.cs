@@ -9,6 +9,7 @@ public class HackGun : MonoBehaviour
 	Camera playerView;
 
 	public GameObject currentTarget;
+	GameObject currentQuarrel;
 	bool shot;
 
 
@@ -41,8 +42,10 @@ public class HackGun : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, targetPoint - transform.position, out hit)) 
 			{
-				GameObject quarrel = Instantiate (sphere, hit.point, Quaternion.identity);
-				quarrel.transform.parent = hit.collider.gameObject.transform;
+				if (currentQuarrel != null)
+					Destroy (currentQuarrel);
+				currentQuarrel = Instantiate (sphere, hit.point, Quaternion.identity);
+				currentQuarrel.transform.parent = hit.collider.gameObject.transform;
 
 				if (hit.collider.gameObject.tag == "Hackable") 
 				{
