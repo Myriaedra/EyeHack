@@ -64,14 +64,6 @@ public class EnemyController : MonoBehaviour {
 			break;
 		}
 
-//		if (GeometryUtility.TestPlanesAABB (cameraPlanes, player.bounds)) 
-//		{
-//			print ("Seen you");
-//		}
-//		else
-//		{
-//			print ("Unseen");
-//		}
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -84,7 +76,7 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	void Attack () {
-		SceneManager.LoadScene ("AlesScene");
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 	}
 
 	void WaitBeforePatrol () {
