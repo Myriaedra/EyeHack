@@ -15,7 +15,8 @@ public class EnemyController : MonoBehaviour {
 	EnemyState state = EnemyState.patrol;
 	public Transform[] patrolPoints;
 	private NavMeshAgent agent;
-	private int nextDestination;
+	public int currentDestination;
+	private int destination;
 	private Plane[] cameraPlanes;
 	public Camera view;
 	public Collider player;
@@ -39,7 +40,7 @@ public class EnemyController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		print (view);
+		print (destination);
 		Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
 		angle = (transform.position - player.transform.position).normalized;
 		angleDifference = Vector3.Angle (-transform.forward, angle);
@@ -68,8 +69,10 @@ public class EnemyController : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (state == EnemyState.patrol) {
-			if (other.tag == "PatrolPoint") {
+		if (state == EnemyState.patrol)
+		{
+			if (other.tag == "PatrolPoint" && other.transform == patrolPoints[destination])
+			{
 				SwitchDestination ();
 			}
 		}
@@ -109,21 +112,35 @@ public class EnemyController : MonoBehaviour {
 		if (patrolPoints.Length > 0)
 		{
 			agent.destination = patrolPoints [0].position;
-			nextDestination = 1;
+			currentDestination = 0;
+			destination = 0;
 		}
 	}
 
 	void SwitchDestination()
 	{
 		print ("Reached destination");
-		agent.destination = patrolPoints [nextDestination].position;
-		if (nextDestination < patrolPoints.Length-1)
+
+
+		if (destination < patrolPoints.Length-1)
 		{
-			nextDestination++;
+			destination++;
 		}
 		else
 		{
-			nextDestination = 0;
+			
+			destination = 0;
 		}
+
+		if (currentDestination < patrolPoints.Length-1)
+		{
+			currentDestination++;
+		}
+		else
+		{
+			currentDestination = 0;
+		}
+
+		agent.destination = patrolPoints [destination].position;
 	}
 }
