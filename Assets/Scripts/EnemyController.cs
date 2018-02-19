@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour {
 	public LevelManager level;
 
 	private NavMeshAgent agent;
-	private int destination;
+	public int destination;
 	private Plane[] cameraPlanes;
 	public Camera view;
 	public Collider player;
@@ -30,7 +30,6 @@ public class EnemyController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		print (searchPatrolPoints.Length);
 		level = GameObject.Find ("LevelManager").GetComponent<LevelManager> ();
 		player = GameObject.Find ("Player").GetComponent<Collider>();
 		view = GetComponentInChildren<Camera> ();
@@ -84,14 +83,15 @@ public class EnemyController : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "PatrolPoint" && other.transform == patrolPoints[destination])
+		if (other.tag == "PatrolPoint")
 		{
-			if (state == EnemyState.patrol)
+			if (state == EnemyState.patrol && other.transform == patrolPoints[destination])
 			{
 				SwitchDestination (patrolPoints);
 			}
-			else if (state == EnemyState.search)
+			else if (state == EnemyState.search && other.transform == searchPatrolPoints[destination])
 			{
+//				print ("YOYOYO");
 				SwitchDestination (searchPatrolPoints);
 				CheckEndSearch (other);
 			}
@@ -160,24 +160,30 @@ public class EnemyController : MonoBehaviour {
 		
 	void GetSearchPoints()
 	{
-		searchPatrolPoints = new Transform[] {level.searchPoints [0], level.searchPoints [0], level.searchPoints [0], level.searchPoints [0]};
-		print (searchPatrolPoints.Length);
-		for (int i = 0; i < 3; i++)
+		searchPatrolPoints = new Transform[] {level.searchPoints [0], level.searchPoints [1], level.searchPoints [2], level.searchPoints [3]};
+//		print (searchPatrolPoints.Length);
+		List<Transform> searchPointsInOrder = new List<Transform>();
+		for (int n = 0; n < level.searchPoints.Length; n++) {
+			searchPointsInOrder.Add (level.searchPoints[n]);
+			print ("caca");
+		}
+		for (int i = 0; i < searchPatrolPoints.Length; i++)
 		{
-			searchPatrolPoints[i] = level.searchPoints [0];
-			for (int x = 0; x < level.searchPoints.Length; x++)
-			{
-				if (Vector3.Distance (transform.position, level.searchPoints[x].position) < Vector3.Distance (transform.position, searchPatrolPoints[i].position))
-				{
-					searchPatrolPoints [i] = level.searchPoints [x];
+			int index = 0;
+			for (int x = 0; x < searchPointsInOrder.Count - 1; x++) {
+				if (Vector3.Distance (transform.position, searchPointsInOrder [x].position) < Vector3.Distance (transform.position, searchPatrolPoints [i].position) || x == 0) {
+					searchPatrolPoints [i] = searchPointsInOrder [x];
+					index = x;
 				}
 			}
+			searchPointsInOrder.RemoveAt (index);
+//			print ("C'est : " + searchPatrolPoints [i] );
 		}
-
 	}
 		
 	void SwitchDestination(Transform[] _patrolPoints)
 	{
+		
 		if (destination < _patrolPoints.Length-1)
 		{
 			destination++;
