@@ -12,19 +12,26 @@ public enum EnemyState {
 
 public class EnemyController : MonoBehaviour {
 
-	public EnemyState state = EnemyState.patrol;
-	public Transform[] patrolPoints;
-	public Transform[] searchPatrolPoints;
 	public LevelManager level;
+	public Camera view;
+	public Collider player;
+
+	public EnemyState state = EnemyState.patrol;
 
 	private NavMeshAgent agent;
 	public int destination;
+	public Transform[] patrolPoints;
+	public Transform[] searchPatrolPoints;
+
 	private Plane[] cameraPlanes;
-	public Camera view;
-	public Collider player;
 	Vector3 angle;
 	float angleDifference;
 	RaycastHit hit;
+	float heardTimer;
+
+	bool isLookingAround;
+	float lookingAroundTimer;
+	int pauseIndex;
 
 
 	// Use this for initialization
@@ -35,11 +42,9 @@ public class EnemyController : MonoBehaviour {
 		view = GetComponentInChildren<Camera> ();
 		cameraPlanes = GeometryUtility.CalculateFrustumPlanes (view);
 		agent = GetComponent<NavMeshAgent> ();
-//		agent.Stop ();
 		StartPatrol();
 	}
-	
-	// Update is called once per frame
+
 	void Update ()
 	{
 		Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
@@ -48,6 +53,7 @@ public class EnemyController : MonoBehaviour {
 
 		switch (state)
 		{
+
 		case EnemyState.chase:
 			ChaseBehavior ();
 			break;
@@ -57,16 +63,25 @@ public class EnemyController : MonoBehaviour {
 			break;
 
 		case EnemyState.search:
-			SearchPatrol ();
 			CheckForPlayer ();
+			if (isLookingAround)
+			{
+				LookAround ();
+			}
 			break;
+		
+		}
+
+		if (heardTimer > 0)
+		{
+			heardTimer -= Time.deltaTime;
 		}
 
 	}
 		
 	void ChaseBehavior()
 	{
-		if (angleDifference >= 30)
+		if (angleDifference >= 30  && heardTimer <= 0)
 		{
 			StartSearch ();
 		}
@@ -76,25 +91,24 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	void SearchPatrol()
-	{
-		
-	}
-
 	void OnTriggerEnter (Collider other)
 	{
 		if (other.tag == "PatrolPoint")
 		{
-			if (state == EnemyState.patrol && other.transform == patrolPoints[destination])
+			if (state == EnemyState.patrol && other.transform == patrolPoints [destination])
 			{
 				SwitchDestination (patrolPoints);
 			}
-			else if (state == EnemyState.search && other.transform == searchPatrolPoints[destination])
+			else if (state == EnemyState.search && other.transform == searchPatrolPoints [destination] && !isLookingAround)
 			{
-//				print ("YOYOYO");
 				SwitchDestination (searchPatrolPoints);
 				CheckEndSearch (other);
 			}
+		}
+		else if (other.tag == "Player")
+		{
+			StartChase ();
+			HeardPlayer ();
 		}
 	}
 		
@@ -105,20 +119,30 @@ public class EnemyController : MonoBehaviour {
 
 	void CheckEndSearch (Collider _other)
 	{
-		if (_other.transform == searchPatrolPoints[3])
+		if (_other.transform == searchPatrolPoints [3])
 		{
 			StartPatrol ();
+		}
+		else
+		{
+			StartLookingARound ();
 		}
 	}
 		
 	void CheckForPlayer()
 	{
-		if (angleDifference < 30 && Physics.Linecast (transform.position, player.transform.position, out hit)) {
+		if (angleDifference < 30 && Physics.Linecast (transform.position, player.transform.position, out hit))
+		{
 			if (hit.collider == player)
 			{
 				StartChase ();
 			}
 		}
+	}
+
+	void HeardPlayer()
+	{
+		heardTimer = 1f;
 	}
 
 	IEnumerator GetPlayerPosition ()
@@ -133,6 +157,7 @@ public class EnemyController : MonoBehaviour {
 
 	void StartSearch()
 	{
+		agent.isStopped = false;
 		state = EnemyState.search;
 		agent.speed = 2f;
 		GetSearchPoints ();
@@ -142,6 +167,7 @@ public class EnemyController : MonoBehaviour {
 
 	void StartChase()
 	{
+		agent.isStopped = false;
 		state = EnemyState.chase;
 		agent.speed = 7f;
 		StartCoroutine ("GetPlayerPosition");
@@ -149,6 +175,7 @@ public class EnemyController : MonoBehaviour {
 		
 	void StartPatrol()
 	{
+		agent.isStopped = false;
 		state = EnemyState.patrol;
 		agent.speed = 3.5f;
 		if (patrolPoints.Length > 0)
@@ -161,24 +188,57 @@ public class EnemyController : MonoBehaviour {
 	void GetSearchPoints()
 	{
 		searchPatrolPoints = new Transform[] {level.searchPoints [0], level.searchPoints [1], level.searchPoints [2], level.searchPoints [3]};
-//		print (searchPatrolPoints.Length);
 		List<Transform> searchPointsInOrder = new List<Transform>();
-		for (int n = 0; n < level.searchPoints.Length; n++) {
+		for (int n = 0; n < level.searchPoints.Length; n++)
+		{
 			searchPointsInOrder.Add (level.searchPoints[n]);
-			print ("caca");
 		}
 		for (int i = 0; i < searchPatrolPoints.Length; i++)
 		{
 			int index = 0;
-			for (int x = 0; x < searchPointsInOrder.Count - 1; x++) {
-				if (Vector3.Distance (transform.position, searchPointsInOrder [x].position) < Vector3.Distance (transform.position, searchPatrolPoints [i].position) || x == 0) {
+			for (int x = 0; x < searchPointsInOrder.Count - 1; x++)
+			{
+				if (Vector3.Distance (transform.position, searchPointsInOrder [x].position) < Vector3.Distance (transform.position, searchPatrolPoints [i].position) || x == 0)
+				{
 					searchPatrolPoints [i] = searchPointsInOrder [x];
 					index = x;
 				}
 			}
 			searchPointsInOrder.RemoveAt (index);
-//			print ("C'est : " + searchPatrolPoints [i] );
 		}
+	}
+
+	void StartLookingARound()
+	{
+		isLookingAround = true;
+		lookingAroundTimer = 360;
+		agent.isStopped = true;
+		pauseIndex = 0;
+	}
+
+	void LookAround()
+	{
+		transform.Rotate (transform.up * Time.deltaTime * (360/3));
+		lookingAroundTimer -= Time.deltaTime * (360/3);
+		if (lookingAroundTimer <= 0 && pauseIndex == 3)
+		{
+			isLookingAround = false;
+			agent.isStopped = false;
+		}
+		else if ((lookingAroundTimer <= 90 && pauseIndex == 2) ||
+				(lookingAroundTimer <= 180 && pauseIndex == 1) ||
+				(lookingAroundTimer <= 270 && pauseIndex == 0))
+		{
+			StartCoroutine ("Pause");
+		}
+	}
+
+	IEnumerator Pause()
+	{
+		pauseIndex++;
+		isLookingAround = false;
+		yield return new WaitForSeconds (1);
+		isLookingAround = true;
 	}
 		
 	void SwitchDestination(Transform[] _patrolPoints)
