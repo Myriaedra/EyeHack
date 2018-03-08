@@ -7,7 +7,7 @@ public class Viewable : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		enemyView = transform.GetComponentInChildren<Camera> ();
-		Debug.Log (enemyView);
+		//Debug.Log (enemyView);
 	}
 	
 	// Update is called once per frame

@@ -6,9 +6,9 @@ using Cinemachine;
 public class TP_ShoulderAiming : MonoBehaviour {
 	public Transform aimMarker;
 	public CinemachineVirtualCamera aimingView;
+	public GameObject pivot;
 	public CinemachineFreeLook normalView;
 
-	public Vector3[] cameraCorners;
 	public float horizontalSpeed;
 	public float verticalSpeed;
 	public float vMax;
@@ -21,14 +21,13 @@ public class TP_ShoulderAiming : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		cameraCorners = new Vector3[4];
 		verticalRotation = aimingView.transform.localRotation.eulerAngles.x;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		if (Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f)// || Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
+		if ((Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f) && PlayerController.isAiming)
 		{
 			float hChange = Input.GetAxis("OrbitHorizontal")*horizontalSpeed;
 
@@ -48,19 +47,40 @@ public class TP_ShoulderAiming : MonoBehaviour {
 					vChange = vMax;
 			}
 			
-			aimingView.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.localRotation.eulerAngles.y, aimingView.transform.localRotation.eulerAngles.z));
+			//aimingView.transform.rotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.rotation.eulerAngles.y, aimingView.transform.rotation.eulerAngles.z));
+			pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
 		}
-
-		/*UpdateCameraCorners (Camera.main.transform.position, Camera.main.transform.rotation);
-		CheckCameraBoundraries ();*/
 	}
 
 	public void AimingMode (bool value)
 	{
+		if (value) {
+			StartCoroutine (OrientPlayer (value));
+		} else {
+			normalView.enabled = !value;
+			aimingView.gameObject.SetActive(value);
+			vChange = 0f;
+			pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
+		}
+
+
+	}
+
+	IEnumerator OrientPlayer(bool value)
+	{
+		Quaternion originRotation = transform.rotation;
+		Vector3 camRotation = new Vector3 (originRotation.eulerAngles.x, Camera.main.transform.rotation.eulerAngles.y, originRotation.eulerAngles.z);
+		float i = 0;
+		while (i <= 1) 
+		{
+			transform.rotation = Quaternion.Slerp (originRotation, Quaternion.Euler(camRotation), i);
+			i += 0.1f;
+			yield return null;
+		}
 		normalView.enabled = !value;
 		aimingView.gameObject.SetActive(value);
 		vChange = 0f;
-		aimingView.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.localRotation.eulerAngles.y, aimingView.transform.localRotation.eulerAngles.z));
+		pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
 	}
 
 	/*public void CheckCameraBoundraries()

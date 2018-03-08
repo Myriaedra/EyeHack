@@ -35,7 +35,7 @@ public class HackGun : MonoBehaviour
 		}
 
 
-		if (Input.GetAxisRaw ("Hack") > 0.8 && !shot) 
+		if (Input.GetAxisRaw ("Hack") > 0.4 && !shot) 
 		{
 			RaycastHit hit;
 			Vector3 targetPoint = aimingSys.GetTargetPoint ();
@@ -46,10 +46,15 @@ public class HackGun : MonoBehaviour
 					Destroy (currentQuarrel);
 				currentQuarrel = Instantiate (sphere, hit.point, Quaternion.identity);
 				currentQuarrel.transform.parent = hit.collider.gameObject.transform;
+				currentQuarrel.layer = 1;
 
 				if (hit.collider.gameObject.tag == "Hackable") 
 				{
 					currentTarget = hit.collider.gameObject;
+				}
+				else 
+				{
+					currentTarget = null;
 				}
 			}
 			shot = true;
@@ -60,11 +65,16 @@ public class HackGun : MonoBehaviour
 		}
 
 
-		if (Input.GetButtonDown ("Interaction")) 
+		if (Input.GetButtonDown ("Interaction") && currentTarget != null) 
 		{
 			if (currentTarget.GetComponent<Viewable>() != null) 
 			{
-				ViewInterpolation (currentTarget.GetComponent<Viewable>().GetView ());
+				ViewInterpolation(currentTarget.GetComponent<Viewable>().GetView ());
+
+				if (PlayerController.isAiming) 
+				{
+					aimingSys.AimingMode (false);
+				}
 			}
 		}
 	}
@@ -75,4 +85,5 @@ public class HackGun : MonoBehaviour
 		playerView.enabled = !playerView.enabled;
 		enemyView.enabled = !enemyView.enabled;
 	}	
+		
 }
