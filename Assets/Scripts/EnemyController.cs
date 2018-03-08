@@ -165,7 +165,6 @@ public class EnemyController : MonoBehaviour {
 		List<Transform> searchPointsInOrder = new List<Transform>();
 		for (int n = 0; n < level.searchPoints.Length; n++) {
 			searchPointsInOrder.Add (level.searchPoints[n]);
-			print ("caca");
 		}
 		for (int i = 0; i < searchPatrolPoints.Length; i++)
 		{
