@@ -7,7 +7,6 @@ public class H_Trap : Hackable
 	public float openTimer;
 	public Transform openTarget;
 
-
 	// Use this for initialization
 	void Start () {
 		

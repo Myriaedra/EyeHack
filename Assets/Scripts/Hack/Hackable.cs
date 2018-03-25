@@ -5,7 +5,7 @@ using UnityEngine;
 public class Hackable : MonoBehaviour {
 	public bool isActivated;
 	// Use this for initialization
-	void Update()
+	protected virtual void Update()
 	{
 		if (isActivated) {ConstantActivatedEffect ();} 
 		else {ConstantDeactivatedEffect ();}
