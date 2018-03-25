@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour {
+public class Chara_PlayerController : Character {
 
 	Camera cam;
     public  CinemachineFreeLook freeLookCM;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour {
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
+		//print (rb.velocity.y);
 	}
 
 	void FixedUpdate ()//-------------------------------------------------------------------------------------------------------------------
@@ -158,7 +160,7 @@ public class PlayerController : MonoBehaviour {
 			{
 				landed = true;
 				//rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-				rb.velocity = new Vector3(rb.velocity.x/4, 0, rb.velocity.z/4); //Avoid slipping
+				//rb.velocity = new Vector3(rb.velocity.x/4, 0, rb.velocity.z/4); //Avoid slipping
 			}     
 			return true;
 		}
@@ -169,5 +171,10 @@ public class PlayerController : MonoBehaviour {
 			}
 			return false;
 		}
+	}
+
+	public override void DeathCall ()
+	{
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 	}
 }

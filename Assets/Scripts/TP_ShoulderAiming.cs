@@ -14,26 +14,31 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	public float vMax;
 	public float vMin;
 
-	float verticalRotation;
+	float originVerticalPivotRotation;
 	float vChange;
+	float hChange;
 
 
 
 	// Use this for initialization
 	void Start () {
-		verticalRotation = aimingView.transform.localRotation.eulerAngles.x;
+		originVerticalPivotRotation = aimingView.transform.localRotation.eulerAngles.x;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		if ((Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f) && PlayerController.isAiming)
+		AimingHelp ();
+		//Aim horizontaly by rotating the player
+		if ((Input.GetAxis ("OrbitHorizontal") > 0.2f || Input.GetAxis ("OrbitHorizontal") < -0.2f) && Chara_PlayerController.isAiming)
 		{
-			float hChange = Input.GetAxis("OrbitHorizontal")*horizontalSpeed;
+			hChange += Input.GetAxis("OrbitHorizontal")*horizontalSpeed;
 
-			transform.rotation = Quaternion.Euler(new Vector3 (transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y+hChange, transform.rotation.eulerAngles.z));
+			/*transform.rotation = Quaternion.Euler(new Vector3 (transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y+hChange, transform.rotation.eulerAngles.z));
+			hChange = 0f;*/
 		}
 
+		//Aim verticaly by rotating the pivot point of the aimMarker
 		if (Input.GetAxis ("OrbitVertical") > 0.2f || Input.GetAxis ("OrbitVertical") < -0.2f) 
 		{
 			if (vChange >= vMin && vChange <= vMax) 
@@ -46,27 +51,63 @@ public class TP_ShoulderAiming : MonoBehaviour {
 				if (vChange > vMax)
 					vChange = vMax;
 			}
-			
-			//aimingView.transform.rotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, aimingView.transform.rotation.eulerAngles.y, aimingView.transform.rotation.eulerAngles.z));
-			pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
+
+
 		}
+
+		transform.rotation = Quaternion.Euler(new Vector3 (transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y+hChange, transform.rotation.eulerAngles.z));
+		hChange = 0f;
+		pivot.transform.localRotation = Quaternion.Euler (new Vector3 (originVerticalPivotRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
 	}
 
+	/// <summary>
+	/// Switch between aiming and normal mode
+	/// </summary>
+	/// <param name="value">true = aiming / false = normal</param>
 	public void AimingMode (bool value)
 	{
 		if (value) {
-			StartCoroutine (OrientPlayer (value));
+			StartCoroutine (OrientPlayer ());
 		} else {
+			//switch view
 			normalView.enabled = !value;
 			aimingView.gameObject.SetActive(value);
+
+			//reset aiming
 			vChange = 0f;
-			pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
+			pivot.transform.localRotation = Quaternion.Euler (new Vector3 (originVerticalPivotRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
 		}
 
 
 	}
 
-	IEnumerator OrientPlayer(bool value)
+	public void AimingHelp()
+	{
+		RaycastHit hit;
+		LayerMask layerMask = (1 << 2);
+
+		Vector3 targetPoint;
+		Vector3 hitPoint; 
+
+		if (Physics.Raycast (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, out hit, Mathf.Infinity, layerMask)) 
+		{
+			if (hit.collider.tag == "Hackable") 
+			{
+				targetPoint = hit.transform.position;
+				hitPoint = hit.point;
+
+				hChange += AngleDir (hitPoint - Camera.main.transform.position, Camera.main.transform.forward, Vector3.up)*0.5f; 
+				Vector3 right = Vector3.Cross (-Vector3.forward, Vector3.up);
+				vChange += AngleDir (hitPoint - Camera.main.transform.position, Camera.main.transform.forward, right) * 0.5f;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Orients the player towards camera orientation when switching to aiming mode.
+	/// </summary>
+	/// <returns>Coroutine</returns>
+	IEnumerator OrientPlayer()
 	{
 		Quaternion originRotation = transform.rotation;
 		Vector3 camRotation = new Vector3 (originRotation.eulerAngles.x, Camera.main.transform.rotation.eulerAngles.y, originRotation.eulerAngles.z);
@@ -77,10 +118,10 @@ public class TP_ShoulderAiming : MonoBehaviour {
 			i += 0.1f;
 			yield return null;
 		}
-		normalView.enabled = !value;
-		aimingView.gameObject.SetActive(value);
+		normalView.enabled = false;
+		aimingView.gameObject.SetActive(true);
 		vChange = 0f;
-		pivot.transform.localRotation = Quaternion.Euler (new Vector3 (verticalRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
+		pivot.transform.localRotation = Quaternion.Euler (new Vector3 (originVerticalPivotRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
 	}
 
 	/*public void CheckCameraBoundraries()
@@ -134,17 +175,39 @@ public class TP_ShoulderAiming : MonoBehaviour {
 
 	}*/
 
+	/// <summary>
+	/// Gets the target point (currently aimed).
+	/// </summary>
+	/// <returns>The target point.</returns>
 	public Vector3 GetTargetPoint()
 	{
 		Vector3 aimingPoint = new Vector3(0,0,0);
 		RaycastHit hit;
 
-		if (Physics.Raycast (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, out hit)) 
+		LayerMask layerMask = (1 << 2);
+		layerMask = ~layerMask;
+
+		if (Physics.Raycast (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, out hit, Mathf.Infinity, layerMask)) 
 		{
 			aimingPoint = hit.point;
 		}
 		Debug.DrawRay (Camera.main.transform.position, aimMarker.position-Camera.main.transform.position, Color.green, 2f);
 		return aimingPoint;
+	}
+
+	//Returns -1 if target is left and 1 if right (0 if straight forward or backward)
+	float AngleDir(Vector3 fwd, Vector3 targetDir, Vector3 up) 
+	{
+		Vector3 perp = Vector3.Cross(fwd, targetDir);
+		float dir = Vector3.Dot(perp, up);
+
+		if (dir > 0f) {
+			return 1f;
+		} else if (dir < 0f) {
+			return -1f;
+		} else {
+			return 0f;
+		}
 	}
 
 	/*public void UpdateCameraCorners(Vector3 cameraPosition, Quaternion atRotation)

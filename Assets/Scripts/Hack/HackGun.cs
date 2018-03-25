@@ -23,14 +23,14 @@ public class HackGun : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if (Input.GetAxisRaw ("Aim") > 0.8 && !PlayerController.isAiming) 
+		if (Input.GetAxisRaw ("Aim") > 0.8 && !Chara_PlayerController.isAiming) 
 		{
-			PlayerController.isAiming = true;
+			Chara_PlayerController.isAiming = true;
 			aimingSys.AimingMode (true);
 		} 
-		else if (Input.GetAxisRaw ("Aim") < 0.2 && PlayerController.isAiming) 
+		else if (Input.GetAxisRaw ("Aim") < 0.2 && Chara_PlayerController.isAiming) 
 		{
-			PlayerController.isAiming = false;
+			Chara_PlayerController.isAiming = false;
 			aimingSys.AimingMode (false);
 		}
 
@@ -40,7 +40,10 @@ public class HackGun : MonoBehaviour
 			RaycastHit hit;
 			Vector3 targetPoint = aimingSys.GetTargetPoint ();
 
-			if (Physics.Raycast (transform.position, targetPoint - transform.position, out hit)) 
+			LayerMask layerMask = (1 << 2);
+			layerMask = ~layerMask;
+
+			if (Physics.Raycast (transform.position, targetPoint - transform.position, out hit, Mathf.Infinity, layerMask)) 
 			{
 				if (currentQuarrel != null)
 					Destroy (currentQuarrel);
@@ -71,17 +74,22 @@ public class HackGun : MonoBehaviour
 			{
 				ViewInterpolation(currentTarget.GetComponent<Viewable>().GetView ());
 
-				if (PlayerController.isAiming) 
+				if (Chara_PlayerController.isAiming) 
 				{
 					aimingSys.AimingMode (false);
 				}
+			}
+
+			else if (currentTarget.GetComponent<HackSwitch> () != null) 
+			{
+				currentTarget.GetComponent<HackSwitch> ().SwitchTargets ();
 			}
 		}
 	}
 
 	void ViewInterpolation(Camera enemyView)
 	{
-		PlayerController.controlsAble = !PlayerController.controlsAble;
+		Chara_PlayerController.controlsAble = !Chara_PlayerController.controlsAble;
 		playerView.enabled = !playerView.enabled;
 		enemyView.enabled = !enemyView.enabled;
 	}	
