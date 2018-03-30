@@ -31,6 +31,13 @@ public class H_MovingElement : Hackable {
 				transform.position = pointB.position;
 			else
 				transform.position = pointA.position;
+		} 
+		else
+		{
+			if (isActivated) 
+			{
+				currentCoroutine = StartCoroutine (MoveToPointLoop ());
+			}
 		}
 	}
 
