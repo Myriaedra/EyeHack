@@ -148,9 +148,9 @@ public class Chara_PlayerController : Character {
 		//On inverse et donc --> get tout sauf playerMask
 		layerMask = ~layerMask;
         //Set des différentes positions
-       	Vector3 position1 = transform.position - transform.forward/2;
+       	Vector3 position1 = transform.position - transform.forward/10;
         Vector3 position2 = transform.position;
-       	Vector3 position3 = transform.position + transform.forward/2;
+       	Vector3 position3 = transform.position + transform.forward/10;
         //Raycasts !
         if (Physics.Raycast(position1, -transform.up, 1.0f, layerMask) 
         || Physics.Raycast(position2, -transform.up, 1.0f, layerMask) 
