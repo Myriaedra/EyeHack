@@ -112,11 +112,11 @@ public class Chara_PlayerController : Character {
 
 			//If the character is moving
 			if (hVelocity.magnitude > 1 && velocityAxis.magnitude > 0) {
-				Vector3 newVelocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
+				//Vector3 newVelocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
 				float wantedAngle = transform.eulerAngles.y; //Declare
 				//Checks which side to turn (shortest way)
-				float angle = Vector3.Angle (transform.forward, newVelocity.normalized);
-				Vector3 cross = Vector3.Cross (transform.forward, newVelocity.normalized);
+				float angle = Vector3.Angle (transform.forward, velocityAxis.normalized);
+				Vector3 cross = Vector3.Cross (transform.forward, velocityAxis.normalized);
 				if (cross.y < 0)
 					angle = -angle;
 				wantedAngle = transform.eulerAngles.y + angle;
@@ -148,13 +148,13 @@ public class Chara_PlayerController : Character {
 		//On inverse et donc --> get tout sauf playerMask
 		layerMask = ~layerMask;
         //Set des différentes positions
-        //Vector3 position1 = transform.position - transform.forward;
+       	Vector3 position1 = transform.position - transform.forward/2;
         Vector3 position2 = transform.position;
-       // Vector3 position3 = transform.position + transform.forward;
+       	Vector3 position3 = transform.position + transform.forward/2;
         //Raycasts !
-        if (/*Physics.Raycast(position1, -transform.up, 1.0f, layerMask) 
-        ||*/ Physics.Raycast(position2, -transform.up, 1.0f, layerMask) 
-        /*|| Physics.Raycast(position3, -transform.up, 1.0f, layerMask)*/)
+        if (Physics.Raycast(position1, -transform.up, 1.0f, layerMask) 
+        || Physics.Raycast(position2, -transform.up, 1.0f, layerMask) 
+        || Physics.Raycast(position3, -transform.up, 1.0f, layerMask))
 		{
             if (!landed)
 			{

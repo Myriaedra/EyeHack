@@ -8,6 +8,7 @@ public class H_MovingElement : Hackable {
 
 	[SerializeField]
 	public bool loopMovement;
+	public bool isPTF;
 
 	public Transform pointA;
 	public Transform pointB;
@@ -140,6 +141,22 @@ public class H_MovingElement : Hackable {
 			currentCoroutine = StartCoroutine (MoveToPointLoop ());
 		}
 	}
+
+	void OnCollisionEnter (Collision other)
+	{
+		if (other.gameObject.tag == "Player" && other.transform.position.y > transform.position.y && isPTF) 
+		{
+			other.transform.parent = transform;
+		}
+	}
+
+	void OnCollisionExit (Collision other)
+	{
+		if (other.gameObject.tag == "Player" && isPTF) 
+		{
+			other.transform.parent = null;
+		}
+	}
 }
 
 [CustomEditor(typeof(H_MovingElement))]
@@ -151,6 +168,7 @@ public class H_MovingElementEditor : Editor
 		movingElement.isActivated = EditorGUILayout.Toggle("Activated ?", movingElement.isActivated);
 		EditorGUILayout.LabelField ("Behaviour type", EditorStyles.boldLabel);
 		movingElement.loopMovement = EditorGUILayout.Toggle("Loop Movement", movingElement.loopMovement);
+		movingElement.isPTF = EditorGUILayout.Toggle("Is a Platform", movingElement.isPTF);
 		EditorGUILayout.Space ();
 
 		EditorGUILayout.LabelField ("Movement Paramaters", EditorStyles.boldLabel);
