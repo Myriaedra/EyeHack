@@ -1,0 +1,10 @@
+S3N_T1_N3L : 30fps / NTSC
+--------------------------
+Animation_Sheet
+---------------
+
+Idle : 1-84 frames
+Walk : 90-180 frames
+Run : 190-220 frames
+Spotted : 230-270 frames
+Attack : 280-400 frames

@@ -7,10 +7,12 @@ using UnityEngine.SceneManagement;
 public enum EnemyState {
 	patrol,
 	chase,
-	search
+	search,
+	called
 }
 
-public class EnemyController : MonoBehaviour {
+public class EnemyController : Character {
+
 
 	public LevelManager level;
 	public Camera view;
@@ -24,15 +26,16 @@ public class EnemyController : MonoBehaviour {
 	public Transform[] searchPatrolPoints;
 
 	private Plane[] cameraPlanes;
-	Vector3 angle;
-	float angleDifference;
-	RaycastHit hit;
-	float heardTimer;
+	private Vector3 angle;
+	private float angleDifference;
+	private RaycastHit hit;
+	private float heardTimer;
 
-	bool isLookingAround;
-	float lookingAroundTimer;
-	int pauseIndex;
+	private bool isLookingAround;
+	private float lookingAroundTimer;
+	private int pauseIndex;
 
+	public bool activated = true;
 
 	// Use this for initialization
 	void Start ()
@@ -42,41 +45,41 @@ public class EnemyController : MonoBehaviour {
 		view = GetComponentInChildren<Camera> ();
 		cameraPlanes = GeometryUtility.CalculateFrustumPlanes (view);
 		agent = GetComponent<NavMeshAgent> ();
-		StartPatrol();
+		if (activated) {
+			StartPatrol ();
+		}
 	}
 
 	void Update ()
 	{
-		Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
-		angle = (transform.position - player.transform.position).normalized;
-		angleDifference = Vector3.Angle (-transform.forward, angle);
+		if (activated) {
+//			Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
+			angle = (transform.position - player.transform.position).normalized;
+			angleDifference = Vector3.Angle (-transform.forward, angle);
 
-		switch (state)
-		{
+			switch (state) {
 
-		case EnemyState.chase:
-			ChaseBehavior ();
-			break;
+			case EnemyState.chase:
+				ChaseBehavior ();
+				break;
 
-		case EnemyState.patrol:
-			CheckForPlayer ();
-			break;
+			case EnemyState.patrol:
+				CheckForPlayer ();
+				break;
 
-		case EnemyState.search:
-			CheckForPlayer ();
-			if (isLookingAround)
-			{
-				LookAround ();
-			}
-			break;
+			case EnemyState.search:
+				CheckForPlayer ();
+				if (isLookingAround) {
+					LookAround ();
+				}
+				break;
 		
-		}
+			}
 
-		if (heardTimer > 0)
-		{
-			heardTimer -= Time.deltaTime;
+			if (heardTimer > 0) {
+				heardTimer -= Time.deltaTime;
+			}
 		}
-
 	}
 		
 	void ChaseBehavior()
@@ -93,7 +96,11 @@ public class EnemyController : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "PatrolPoint")
+		if (other.tag == "CallingPoint" && state == EnemyState.called) {
+			StartChase ();
+			Destroy(other.gameObject);
+		}
+		else if (other.tag == "PatrolPoint")
 		{
 			if (state == EnemyState.patrol && other.transform == patrolPoints [destination])
 			{
@@ -255,4 +262,11 @@ public class EnemyController : MonoBehaviour {
 
 		agent.destination = _patrolPoints [destination].position;
 	}
+
+	public void Called(Vector3 callDestination) {
+		activated = true;
+		state = EnemyState.called;
+		agent.destination = callDestination;
+	}
+
 }
