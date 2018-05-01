@@ -8,12 +8,19 @@ public class H_Bumper : Hackable {
 	public float force;
 	public Transform directionTarget;
 	Vector3 direction = new Vector3 (0, 0, 0);
+	BoxCollider bumperCollider;
 
 
 	void Start()
 	{
 		direction = directionTarget.position - transform.position;
 		direction = direction.normalized;
+		bumperCollider = GetComponent<BoxCollider> ();
+
+		if (isActivated)
+			bumperCollider.isTrigger = true;
+		else
+			bumperCollider.isTrigger = false;
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -25,6 +32,16 @@ public class H_Bumper : Hackable {
 			rB.velocity = new Vector3 (rB.velocity.x, 0, rB.velocity.z);
 			rB.AddForce (direction * fallEnergy * force);
 		}
+	}
+
+	public override void OnActivationEffect ()
+	{
+		bumperCollider.isTrigger = true;
+	}
+
+	public override void OnDeactivationEffect ()
+	{
+		bumperCollider.isTrigger = false;
 	}
 }
 

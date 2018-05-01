@@ -43,7 +43,7 @@ public class H_ConveyorBelt : Hackable {
 		}
 	}
 
-	void OnCollisionEnter (Collision other)
+	/*void OnCollisionEnter (Collision other)
 	{
 		if (other.gameObject.GetComponent<Character> () != null) 
 		{
@@ -57,5 +57,21 @@ public class H_ConveyorBelt : Hackable {
 		{
 			currentTargets.Remove (other.other.gameObject.GetComponent<Character> ());
 		}
+	}*/
+	void OnTriggerEnter (Collider other)
+	{
+		if (other.gameObject.GetComponent<Character> () != null) 
+		{
+			currentTargets.Add (other.gameObject.GetComponent<Character> ());
+		}
 	}
+
+	void OnTriggerExit (Collider other)
+	{
+		if (other.gameObject.GetComponent<Character> () != null) 
+		{
+			currentTargets.Remove (other.gameObject.GetComponent<Character> ());
+		}
+	}
+
 }
