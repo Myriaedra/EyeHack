@@ -32,10 +32,16 @@ public class EnemyCameraController : Character {
 		{
 		case EnemyCameraState.watching:
 			CheckForPlayer ();
+			if (target.isActivated) {
+				target.Switch ();
+			}
 			break;
 
 		case EnemyCameraState.alarm:
 			AlarmBehaviour ();
+			if (!target.isActivated) {
+				target.Switch ();
+			}
 			break;
 		}
 	}
