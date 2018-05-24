@@ -23,16 +23,21 @@ public class HackGun : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if (Input.GetAxisRaw ("Aim") > 0.8 && !Chara_PlayerController.isAiming) 
+		if (Input.GetAxisRaw ("Aim") >= 1 && !Chara_PlayerController.isAiming) 
 		{
-			Chara_PlayerController.isAiming = true;
+            print(Input.GetAxisRaw("Aim"));
+            Chara_PlayerController.isAiming = true;
 			aimingSys.AimingMode (true);
-		} 
-		else if (Input.GetAxisRaw ("Aim") < 0.2 && Chara_PlayerController.isAiming) 
-		{
-			Chara_PlayerController.isAiming = false;
-			aimingSys.AimingMode (false);
+            print("ON");
 		}
+
+        else if (Input.GetAxisRaw ("Aim") <= 0 && (Chara_PlayerController.isAiming || aimingSys.aimingView.gameObject.active == true)) 
+		{
+            print(Input.GetAxisRaw("Aim"));
+            Chara_PlayerController.isAiming = false;
+			aimingSys.AimingMode (false);
+            print("OFF");
+        }
 
 
 		if (Input.GetAxisRaw ("Hack") > 0.4 && !shot) 

@@ -90,6 +90,7 @@ public class Chara_PlayerController : Character {
 	void LimitVelocity(float speedLimit)//FONCTION MAXSPEED
 	{
 		Vector2 xzVel = new Vector2(rb.velocity.x, rb.velocity.z);
+        print(xzVel.magnitude);
 		if (xzVel.magnitude > speedLimit)
 		{
 			xzVel = xzVel.normalized * speedLimit;
@@ -138,8 +139,8 @@ public class Chara_PlayerController : Character {
 		float zSpeed = Input.GetAxis("Vertical");
 		Vector3 velocityAxis = new Vector3(xSpeed, 0, zSpeed);
 		velocityAxis = Quaternion.AngleAxis(cam.transform.eulerAngles.y, Vector3.up) * velocityAxis;
-		rb.AddForce(velocityAxis.normalized * acceleration);
-	}
+        rb.AddForce(velocityAxis * acceleration);
+    }
 
 	bool IsGrounded()//VERIFIER SI ON EST AU SOL
 	{
