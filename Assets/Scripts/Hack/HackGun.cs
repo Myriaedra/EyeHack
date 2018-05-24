@@ -53,7 +53,7 @@ public class HackGun : MonoBehaviour
 				if (currentQuarrel != null)
 					Destroy (currentQuarrel);
 				currentQuarrel = Instantiate (sphere, hit.point, Quaternion.identity);
-				currentQuarrel.transform.parent = hit.collider.gameObject.transform;
+				currentQuarrel.transform.parent = GetParentFromTag(hit.collider.gameObject.transform, "TerrainParent");
 				currentQuarrel.layer = 1;
 
 				if (hit.collider.gameObject.tag == "Hackable") 
@@ -97,6 +97,23 @@ public class HackGun : MonoBehaviour
 		Chara_PlayerController.controlsAble = !Chara_PlayerController.controlsAble;
 		playerView.enabled = !playerView.enabled;
 		enemyView.enabled = !enemyView.enabled;
-	}	
+	}
+
+    Transform GetParentFromTag(Transform target, string _tag)
+    {
+        Transform parent = target.parent;
+
+        while (parent != null)
+        {
+            if (parent.tag == _tag)
+            {
+                return parent.transform;
+            }
+
+            parent = parent.transform.parent;
+        }
+
+        return null;
+    }
 		
 }
