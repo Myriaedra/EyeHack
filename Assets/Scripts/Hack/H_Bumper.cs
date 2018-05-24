@@ -55,7 +55,7 @@ public class H_BumperEditor : Editor
 		bumper.isActivated = EditorGUILayout.Toggle("Activated ?", bumper.isActivated);
 		EditorGUILayout.LabelField ("Parameter", EditorStyles.boldLabel);
 		bumper.force = EditorGUILayout.Slider ("Rebound multiplier :", bumper.force, 60f, 80f);
-		bumper.maxForce = EditorGUILayout.Slider ("Maximum rebound force :", bumper.maxForce, 1000f, 2000f);
+		bumper.maxForce = EditorGUILayout.Slider ("Maximum rebound force :", bumper.maxForce, 1000f, 10000f);
 		bumper.directionTarget = EditorGUILayout.ObjectField ("Direction Target :", bumper.directionTarget, typeof(Transform), true) as Transform;
 		if (GUI.changed)
 		{
