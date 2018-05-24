@@ -50,19 +50,15 @@ public class HackGun : MonoBehaviour
 
 			if (Physics.Raycast (transform.position, targetPoint - transform.position, out hit, Mathf.Infinity, layerMask)) 
 			{
-				if (currentQuarrel != null)
-					Destroy (currentQuarrel);
-				currentQuarrel = Instantiate (sphere, hit.point, Quaternion.identity);
-				currentQuarrel.transform.parent = GetParentFromTag(hit.collider.gameObject.transform, "TerrainParent");
-				currentQuarrel.layer = 1;
-
-				if (hit.collider.gameObject.tag == "Hackable") 
-				{
+				if (hit.collider.gameObject.tag == "Hackable")
+                {
+                    if (currentQuarrel != null)
+                            Destroy(currentQuarrel);
+                    currentQuarrel = Instantiate(sphere, hit.point, Quaternion.identity);
+                    currentQuarrel.transform.parent = hit.collider.gameObject.transform;
+                    currentQuarrel.layer = 1;
+               
 					currentTarget = hit.collider.gameObject;
-				}
-				else 
-				{
-					currentTarget = null;
 				}
 			}
 			shot = true;
