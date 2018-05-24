@@ -36,6 +36,7 @@ public class FixedEnemyController : Character {
 
 	// Use this for initialization
 	void Start () {
+		player = GameObject.Find ("Player").GetComponent<Collider>();
 		initialAngle = transform.rotation.eulerAngles.y;
 	}
 	
