@@ -11,6 +11,7 @@ public class Chara_PlayerController : Character {
 	Rigidbody rb;
     public static bool controlsAble = true;
 	public static bool isAiming = false;
+    public LayerMask groundLayer;
 
     [Header("GroundValues : ")]
     public float groundAcceleration;
@@ -24,8 +25,11 @@ public class Chara_PlayerController : Character {
 
     [Header("OtherValues : ")]
     public float jumpForce;
+    public float bufferValue;
 
-	bool landed = false;
+    bool landed = false;
+    
+    float buffer;
 
 
 	// Use this for initialization
@@ -37,9 +41,16 @@ public class Chara_PlayerController : Character {
 
 	void Update()//--------------------------------------------------------------------------------------------------------------------------
 	{
-
+        if (Input.GetButtonDown("Jump") && buffer <= 0f)
+        {
+            buffer = bufferValue;
+        }
+        else if (buffer > 0f)
+        {
+            buffer -= Time.deltaTime;
+        }
         //JUMP MANAGEMENT
-        if (Input.GetButtonDown("Jump") && IsGrounded() && controlsAble)
+        if (Input.GetButton("Jump") && landed && controlsAble)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
@@ -90,7 +101,6 @@ public class Chara_PlayerController : Character {
 	void LimitVelocity(float speedLimit)//FONCTION MAXSPEED
 	{
 		Vector2 xzVel = new Vector2(rb.velocity.x, rb.velocity.z);
-        print(xzVel.magnitude);
 		if (xzVel.magnitude > speedLimit)
 		{
 			xzVel = xzVel.normalized * speedLimit;
@@ -144,18 +154,14 @@ public class Chara_PlayerController : Character {
 
 	bool IsGrounded()//VERIFIER SI ON EST AU SOL
 	{
-		//Get PlayerMask
-		int layerMask = 1 << 8;
-		//On inverse et donc --> get tout sauf playerMask
-		layerMask = ~layerMask;
-        //Set des différentes positions
+        RaycastHit hit;
        	Vector3 position1 = transform.position - transform.forward/10;
-        Vector3 position2 = transform.position;
-       	Vector3 position3 = transform.position + transform.forward/10;
+
         //Raycasts !
-        if (Physics.Raycast(position1, -transform.up, 1.0f, layerMask) 
-        || Physics.Raycast(position2, -transform.up, 1.0f, layerMask) 
-        || Physics.Raycast(position3, -transform.up, 1.0f, layerMask))
+        if (/*Physics.Raycast(position1, -transform.up, 1.2f, groundLayer) 
+        || Physics.Raycast(position2, -transform.up, 1.2f, groundLayer) 
+        || Physics.Raycast(position3, -transform.up, 1.2f, groundLayer)*/
+        Physics.SphereCast(position1, 0.5f, -transform.up, out hit, 1.2f, groundLayer))
 		{
             if (!landed)
 			{
