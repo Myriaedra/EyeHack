@@ -18,6 +18,8 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	float vChange;
 	float hChange;
 
+    Coroutine aimingModeCo;
+
 
 
 	// Use this for initialization
@@ -66,12 +68,26 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	/// <param name="value">true = aiming / false = normal</param>
 	public void AimingMode (bool value)
 	{
-		if (value) {
-			StartCoroutine (OrientPlayer ());
-		} else {
+        if (value)
+        {
+            print("mode ON");
+            if (aimingModeCo == null)
+                StartCoroutine(OrientPlayer());
+            else
+                StopCoroutine(aimingModeCo);
+            StartCoroutine(OrientPlayer());
+        }
+        if (!value)
+        {
+            print("mode OFF");
+            if (aimingModeCo != null)
+            {
+                StopCoroutine(aimingModeCo);
+                aimingModeCo = null;
+            }
 			//switch view
-			normalView.enabled = !value;
-			aimingView.gameObject.SetActive(value);
+			normalView.gameObject.SetActive(true);
+			aimingView.gameObject.SetActive(false);
 
 			//reset aiming
 			vChange = 0f;
@@ -118,11 +134,12 @@ public class TP_ShoulderAiming : MonoBehaviour {
 			i += 0.1f;
 			yield return null;
 		}
-		normalView.enabled = false;
+		normalView.gameObject.SetActive(false);
 		aimingView.gameObject.SetActive(true);
 		vChange = 0f;
 		pivot.transform.localRotation = Quaternion.Euler (new Vector3 (originVerticalPivotRotation+vChange, pivot.transform.localRotation.eulerAngles.y, pivot.transform.localRotation.eulerAngles.z));
-	}
+        aimingModeCo = null;
+    }
 
 	/*public void CheckCameraBoundraries()
 	{

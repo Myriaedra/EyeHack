@@ -6,6 +6,7 @@ using System;
 
 public class H_Bumper : Hackable {
 	public float force;
+	public float maxForce;
 	public Transform directionTarget;
 	Vector3 direction = new Vector3 (0, 0, 0);
 	BoxCollider bumperCollider;
@@ -30,7 +31,7 @@ public class H_Bumper : Hackable {
 			Rigidbody rB = other.gameObject.GetComponent<Rigidbody> ();
 			float fallEnergy = -rB.velocity.y;
 			rB.velocity = new Vector3 (rB.velocity.x, 0, rB.velocity.z);
-			rB.AddForce (direction * fallEnergy * force);
+			rB.AddForce (Vector3.ClampMagnitude(direction * fallEnergy * force, maxForce));
 		}
 	}
 
@@ -54,6 +55,7 @@ public class H_BumperEditor : Editor
 		bumper.isActivated = EditorGUILayout.Toggle("Activated ?", bumper.isActivated);
 		EditorGUILayout.LabelField ("Parameter", EditorStyles.boldLabel);
 		bumper.force = EditorGUILayout.Slider ("Rebound multiplier :", bumper.force, 60f, 80f);
+		bumper.maxForce = EditorGUILayout.Slider ("Maximum rebound force :", bumper.maxForce, 1000f, 10000f);
 		bumper.directionTarget = EditorGUILayout.ObjectField ("Direction Target :", bumper.directionTarget, typeof(Transform), true) as Transform;
 		if (GUI.changed)
 		{

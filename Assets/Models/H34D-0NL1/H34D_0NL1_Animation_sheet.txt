@@ -1,0 +1,9 @@
+Animation 30 FPS / NTSC
+---------------------------
+H34D_0NLY :
+-----------
+
+idle : 1-70 frames
+Spotted : 80-90 frames
+Unspotted : 110-143 frames
+Searching : 170-200 frames
