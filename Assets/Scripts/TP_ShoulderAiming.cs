@@ -70,7 +70,6 @@ public class TP_ShoulderAiming : MonoBehaviour {
 	{
         if (value)
         {
-            print("mode ON");
             if (aimingModeCo == null)
                 StartCoroutine(OrientPlayer());
             else
@@ -79,7 +78,6 @@ public class TP_ShoulderAiming : MonoBehaviour {
         }
         if (!value)
         {
-            print("mode OFF");
             if (aimingModeCo != null)
             {
                 StopCoroutine(aimingModeCo);

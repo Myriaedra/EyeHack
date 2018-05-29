@@ -13,7 +13,8 @@ public class H_ConveyorBelt : Hackable {
 	// Use this for initialization
 	void Start () 
 	{
-		forwardDirection = (forwardTarget.position - transform.position).normalized; 
+		forwardDirection = (forwardTarget.position - transform.position).normalized;
+        icon = 2;
 	}
 	
 	protected override void Update()

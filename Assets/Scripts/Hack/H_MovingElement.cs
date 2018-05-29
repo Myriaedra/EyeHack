@@ -23,6 +23,11 @@ public class H_MovingElement : Hackable {
 
 	// Use this for initialization
 	void Start () {
+        if (!isPTF)
+            icon = 4;
+        else
+            icon = 5;
+
 		//If the movement does not loop, init position according to it's activation state
 		if (!loopMovement) 
 		{

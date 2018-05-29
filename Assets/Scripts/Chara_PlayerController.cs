@@ -12,6 +12,7 @@ public class Chara_PlayerController : Character {
     public static bool controlsAble = true;
 	public static bool isAiming = false;
     public LayerMask groundLayer;
+    public static bool bumped;
 
     [Header("GroundValues : ")]
     public float groundAcceleration;
@@ -93,7 +94,10 @@ public class Chara_PlayerController : Character {
 	{
             Move(airAcceleration);
             GravityMod(3.0f);
-            LimitVelocity(airMaxSpeed);
+
+            if (!bumped)
+                LimitVelocity(airMaxSpeed);
+
             OrientCharacter(0.05f);
             Drag(airDragValue);
 	}
@@ -166,6 +170,8 @@ public class Chara_PlayerController : Character {
             if (!landed)
 			{
 				landed = true;
+                if (bumped)
+                    bumped = false;
 				//rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 				//rb.velocity = new Vector3(rb.velocity.x/4, 0, rb.velocity.z/4); //Avoid slipping
 			}     

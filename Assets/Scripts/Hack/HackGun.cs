@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HackGun : MonoBehaviour 
 {
@@ -12,12 +13,16 @@ public class HackGun : MonoBehaviour
 	GameObject currentQuarrel;
 	bool shot;
 
+    public Image currentIcon;
+    public Sprite[] icons;
+
 
 	// Use this for initialization
 	void Start () 
 	{
 		aimingSys = transform.GetComponent<TP_ShoulderAiming> ();
 		playerView = Camera.main;
+        currentIcon.sprite = icons[0];
 	}
 	
 	// Update is called once per frame
@@ -25,18 +30,14 @@ public class HackGun : MonoBehaviour
 	{
 		if (Input.GetAxisRaw ("Aim") >= 1 && !Chara_PlayerController.isAiming) 
 		{
-            print(Input.GetAxisRaw("Aim"));
             Chara_PlayerController.isAiming = true;
 			aimingSys.AimingMode (true);
-            print("ON");
 		}
 
         else if (Input.GetAxisRaw ("Aim") <= 0 && (Chara_PlayerController.isAiming || aimingSys.aimingView.gameObject.active == true)) 
 		{
-            print(Input.GetAxisRaw("Aim"));
             Chara_PlayerController.isAiming = false;
 			aimingSys.AimingMode (false);
-            print("OFF");
         }
 
 
@@ -59,6 +60,7 @@ public class HackGun : MonoBehaviour
                     currentQuarrel.layer = 1;
                
 					currentTarget = hit.collider.gameObject;
+                    currentIcon.sprite = icons[currentTarget.GetComponent<HackSwitch>().targets[0].icon];
 				}
 			}
 			shot = true;

@@ -9,7 +9,7 @@ public class H_Trap : Hackable
 
 	// Use this for initialization
 	void Start () {
-		
+        icon = 1;
 	}
 	
 	public override void Switch()
