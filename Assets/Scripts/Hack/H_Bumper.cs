@@ -11,10 +11,10 @@ public class H_Bumper : Hackable {
 	Vector3 direction = new Vector3 (0, 0, 0);
 	BoxCollider bumperCollider;
 
-
 	void Start()
 	{
-		direction = directionTarget.position - transform.position;
+        icon = 3;
+        direction = directionTarget.position - transform.position;
 		direction = direction.normalized;
 		bumperCollider = GetComponent<BoxCollider> ();
 
@@ -32,6 +32,7 @@ public class H_Bumper : Hackable {
 			float fallEnergy = -rB.velocity.y;
 			rB.velocity = new Vector3 (rB.velocity.x, 0, rB.velocity.z);
 			rB.AddForce (Vector3.ClampMagnitude(direction * fallEnergy * force, maxForce));
+            Chara_PlayerController.bumped = true; 
 		}
 	}
 
@@ -54,7 +55,7 @@ public class H_BumperEditor : Editor
 		H_Bumper bumper = (H_Bumper)target;
 		bumper.isActivated = EditorGUILayout.Toggle("Activated ?", bumper.isActivated);
 		EditorGUILayout.LabelField ("Parameter", EditorStyles.boldLabel);
-		bumper.force = EditorGUILayout.Slider ("Rebound multiplier :", bumper.force, 60f, 80f);
+		bumper.force = EditorGUILayout.Slider ("Rebound multiplier :", bumper.force, 60f, 200f);
 		bumper.maxForce = EditorGUILayout.Slider ("Maximum rebound force :", bumper.maxForce, 1000f, 10000f);
 		bumper.directionTarget = EditorGUILayout.ObjectField ("Direction Target :", bumper.directionTarget, typeof(Transform), true) as Transform;
 		if (GUI.changed)

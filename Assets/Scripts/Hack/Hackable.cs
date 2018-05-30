@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Hackable : MonoBehaviour {
 	public bool isActivated;
+    public int icon;
 	// Use this for initialization
 	protected virtual void Update()
 	{
