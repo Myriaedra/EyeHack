@@ -37,6 +37,8 @@ public class EnemyController : Character {
 
 	public bool activated = true;
 
+    public LayerMask groundLayer;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -50,37 +52,42 @@ public class EnemyController : Character {
 		}
 	}
 
-	void Update ()
-	{
-		if (activated) {
-//			Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
-			angle = (transform.position - player.transform.position).normalized;
-			angleDifference = Vector3.Angle (-transform.forward, angle);
+    void Update()
+    {
+        if (activated) {
+            //			Debug.DrawRay (transform.position, transform.forward, Color.red, 1f);
+            angle = (transform.position - player.transform.position).normalized;
+            angleDifference = Vector3.Angle(-transform.forward, angle);
 
-			switch (state) {
+            switch (state) {
 
-			case EnemyState.chase:
-				ChaseBehavior ();
-				break;
+                case EnemyState.chase:
+                    ChaseBehavior();
+                    break;
 
-			case EnemyState.patrol:
-				CheckForPlayer ();
-				break;
+                case EnemyState.patrol:
+                    CheckForPlayer();
+                    break;
 
-			case EnemyState.search:
-				CheckForPlayer ();
-				if (isLookingAround) {
-					LookAround ();
-				}
-				break;
-		
-			}
+                case EnemyState.search:
+                    CheckForPlayer();
+                    if (isLookingAround) {
+                        LookAround();
+                    }
+                    break;
 
-			if (heardTimer > 0) {
-				heardTimer -= Time.deltaTime;
-			}
-		}
-	}
+            }
+
+            if (heardTimer > 0) {
+                heardTimer -= Time.deltaTime;
+            }
+        }
+
+        if (!Physics.SphereCast(transform.position, 0.5f, -transform.up, out hit, 1.2f, groundLayer))
+        {
+            agent.enabled = false;
+        }
+    }
 		
 	void ChaseBehavior()
 	{
@@ -126,7 +133,7 @@ public class EnemyController : Character {
 
 	void CheckEndSearch (Collider _other)
 	{
-		if (_other.transform == searchPatrolPoints [3])
+		if (_other.transform == searchPatrolPoints [1])
 		{
 			StartPatrol ();
 		}
@@ -194,7 +201,7 @@ public class EnemyController : Character {
 		
 	void GetSearchPoints()
 	{
-		searchPatrolPoints = new Transform[] {level.searchPoints [0], level.searchPoints [1], level.searchPoints [2], level.searchPoints [3]};
+		searchPatrolPoints = new Transform[] {level.searchPoints [0], level.searchPoints [1]};                  //À reprendre plus tard
 		List<Transform> searchPointsInOrder = new List<Transform>();
 		for (int n = 0; n < level.searchPoints.Length; n++)
 		{
