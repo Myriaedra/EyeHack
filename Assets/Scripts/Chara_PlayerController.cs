@@ -32,6 +32,15 @@ public class Chara_PlayerController : Character {
     
     float buffer;
 
+	#region
+	 void Debugging()
+	{
+		if (Input.GetKeyDown("joystick button 7"))
+		{
+			SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		}
+	}
+	#endregion
 
 	// Use this for initialization
 	void Start ()
@@ -42,7 +51,8 @@ public class Chara_PlayerController : Character {
 
 	void Update()//--------------------------------------------------------------------------------------------------------------------------
 	{
-        if (Input.GetButtonDown("Jump") && buffer <= 0f)
+		Debugging();
+		if (Input.GetButtonDown("Jump") && buffer <= 0f)
         {
             buffer = bufferValue;
         }

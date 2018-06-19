@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 using System;
 
 public class H_Electric : Hackable {
@@ -75,27 +75,27 @@ public class H_Electric : Hackable {
 	}
 }
 
-[CustomEditor(typeof(H_Electric))]
-public class H_ElectricEditor : Editor
-{
-	override public void OnInspectorGUI()
-	{
-		H_Electric electric = (H_Electric)target;
+//[CustomEditor(typeof(H_Electric))]
+//public class H_ElectricEditor : Editor
+//{
+//	override public void OnInspectorGUI()
+//	{
+//		H_Electric electric = (H_Electric)target;
 
-		electric.isActivated = EditorGUILayout.Toggle("Activated ?", electric.isActivated);
+//		electric.isActivated = EditorGUILayout.Toggle("Activated ?", electric.isActivated);
 
-		electric.ac = EditorGUILayout.Toggle("Alternate currant", electric.ac);
-		EditorGUILayout.Space ();
+//		electric.ac = EditorGUILayout.Toggle("Alternate currant", electric.ac);
+//		EditorGUILayout.Space ();
 
-		using (var group = new EditorGUILayout.FadeGroupScope (Convert.ToSingle (electric.ac))) 
-		{
-			if (group.visible != false) 
-			{
-				EditorGUILayout.LabelField ("Looping Movement Paramaters", EditorStyles.boldLabel);
-				electric.timeON = EditorGUILayout.FloatField ("Time ON (seconds) :", electric.timeON);
-				electric.timeOFF = EditorGUILayout.FloatField ("Time OFF (seconds) :", electric.timeOFF);
-				EditorGUILayout.Space ();
-			}
-		}
-	}
-}
+//		using (var group = new EditorGUILayout.FadeGroupScope (Convert.ToSingle (electric.ac))) 
+//		{
+//			if (group.visible != false) 
+//			{
+//				EditorGUILayout.LabelField ("Looping Movement Paramaters", EditorStyles.boldLabel);
+//				electric.timeON = EditorGUILayout.FloatField ("Time ON (seconds) :", electric.timeON);
+//				electric.timeOFF = EditorGUILayout.FloatField ("Time OFF (seconds) :", electric.timeOFF);
+//				EditorGUILayout.Space ();
+//			}
+//		}
+//	}
+//}

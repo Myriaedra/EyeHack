@@ -86,6 +86,7 @@ public class EnemyController : Character {
         if (!Physics.SphereCast(transform.position, 0.5f, -transform.up, out hit, 1.2f, groundLayer))
         {
             agent.enabled = false;
+			activated = false;
         }
     }
 		
@@ -103,26 +104,30 @@ public class EnemyController : Character {
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "CallingPoint" && state == EnemyState.called) {
-			StartChase ();
-			Destroy(other.gameObject);
-		}
-		else if (other.tag == "PatrolPoint")
+		if (activated)
 		{
-			if (state == EnemyState.patrol && other.transform == patrolPoints [destination])
+			if (other.tag == "CallingPoint" && state == EnemyState.called)
 			{
-				SwitchDestination (patrolPoints);
+				StartChase();
+				Destroy(other.gameObject);
 			}
-			else if (state == EnemyState.search && other.transform == searchPatrolPoints [destination] && !isLookingAround)
+			else if (other.tag == "PatrolPoint")
 			{
-				SwitchDestination (searchPatrolPoints);
-				CheckEndSearch (other);
+				if (state == EnemyState.patrol && other.transform == patrolPoints[destination])
+				{
+					SwitchDestination(patrolPoints);
+				}
+				else if (state == EnemyState.search && other.transform == searchPatrolPoints[destination] && !isLookingAround)
+				{
+					SwitchDestination(searchPatrolPoints);
+					CheckEndSearch(other);
+				}
 			}
-		}
-		else if (other.tag == "Player")
-		{
-			StartChase ();
-			HeardPlayer ();
+			else if (other.tag == "Player")
+			{
+				StartChase();
+				HeardPlayer();
+			}
 		}
 	}
 		
@@ -161,7 +166,7 @@ public class EnemyController : Character {
 
 	IEnumerator GetPlayerPosition ()
 	{
-		if (state == EnemyState.chase)
+		if (state == EnemyState.chase && activated)
 		{
 			agent.destination = player.transform.position;
 			yield return new WaitForSeconds (.2f);
